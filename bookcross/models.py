@@ -1,9 +1,9 @@
+import datetime
 import uuid
 
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
-import datetime
 
 # Create your models here.
 User = get_user_model()
@@ -31,7 +31,6 @@ class BookInstance(models.Model):
                                help_text='Заемщик книги', related_name='loaner_books')
     place = models.ForeignKey('Place', verbose_name='Место хранения', on_delete=models.SET_NULL, null=True, blank=True)
 
-    
     LOAN_STATUS = (
         ('r', 'Зарезервирована'),
         ('m', 'В ремонте'),
