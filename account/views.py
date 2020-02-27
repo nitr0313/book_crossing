@@ -26,11 +26,17 @@ def profile_edit(request):
             profile_form.save()
         return redirect('dashboard')
     else:
-        user_form = UserEditForm(instance=request.user)
-        profile_form = ProfileEditForm(instance=request.user.profile)
-        con['user_form'] = user_form
-        con['profile_form'] = profile_form
-        return render(request,
-                      'account/dashboard.html',
-                      context=con
-                      )
+        if request.user.is_authenticated:
+            if request.user.is_active:
+                user_form = UserEditForm(instance=request.user)
+                profile_form = ProfileEditForm(instance=request.user.profile)
+                con['user_form'] = user_form
+                con['profile_form'] = profile_form
+                return render(request,
+                              'account/dashboard.html',
+                              context=con
+                              )
+            else:
+                return redirect('logout')
+        else:
+            return redirect('login')
