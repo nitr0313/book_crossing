@@ -16,12 +16,21 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 
 from .views import *
 
-urlpatterns = [
-    path('', book_detail, name='book_detail'),
+router = SimpleRouter()
 
+router.register('api/v1/list_book', BookInstanceView)
+
+
+urlpatterns = [
+    path('detail', book_detail, name='book_detail'),
+    path('', BookInstanceListView.as_view(), name='home')
 ]
+
+urlpatterns += router.urls
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

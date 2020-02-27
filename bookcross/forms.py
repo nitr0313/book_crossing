@@ -19,5 +19,6 @@ class BookInstanceForm(forms.ModelForm):
             raise forms.ValidationError('Выбран статус Зарезервирована, при этом не указан Заёмщик')
         if status in ['m', 'a', 'x'] and loaner is not None:
             cd['loaner'] = None
+            cd['reserved_time'] = None
             # raise forms.ValidationError('При данном статусе заемщика быть не должно!')
         return cd

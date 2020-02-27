@@ -32,6 +32,7 @@ class BookInstance(models.Model):
     loaner = models.ForeignKey(User, on_delete=models.SET_NULL, verbose_name='Заемщик', null=True, blank=True,
                                help_text='Заемщик книги', related_name='loaner_books')
     place = models.ForeignKey('Place', verbose_name='Место хранения', on_delete=models.SET_NULL, null=True, blank=True)
+    cover = models.ImageField(verbose_name='Обложка', upload_to="books/%Y/%m/%d", blank=True)
 
     LOAN_STATUS = (
         ('r', 'Зарезервирована'),
@@ -48,10 +49,12 @@ class BookInstance(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.old_status = self.status
-        
 
     def __str__(self):
         return f'{self.id} {self.author} {self.title}'
+
+    def get_cover_url(self):
+        return self.cover.url
 
     class Meta:
         ordering = ('author', 'title')
@@ -83,6 +86,11 @@ class BookInstance(models.Model):
             pth = ' > '.join([tmp.title, pth])
         return pth
 
+    def get_rating(self):
+        rates = BookRating.objects.filter(book=self)
+        print(rates)
+        return sum([int(r.rating) for r in rates])/len(rates)
+
     def save(self, *args, **kwargs):
 
         print(self.status)
@@ -93,18 +101,44 @@ class BookInstance(models.Model):
             ch.loaner = self.loaner
             ch.comment = f'Статус книги изменен c {lstat[self.old_status]} на {lstat[self.status]}'
             ch.save()
-            
+
             if self.status == 'o':
                 self.reserved_time = None
             elif self.status == 'r':
                 self.reserved_time = datetime.datetime.now().replace(tzinfo=None)
-            
+
         # if self.loaner is not None and self.status != 'o' and self.status != 'r':
         #     self.status = 'r'
         #     if self.reserved_time is None:
         #         print('Произошла смена времени резервирования')
-                
+
         return super().save(*args, **kwargs)
+
+
+class BookRating(models.Model):
+    """
+    Отценки поставленные пользотвалем книге
+    """
+    book = models.ForeignKey('BookInstance', on_delete=models.CASCADE, related_name='book_rating')
+    RATING = (
+        ('5', 5),
+        ('4', 4),
+        ('3', 3),
+        ('2', 2),
+        ('1', 1),
+    )
+    rating = models.CharField(max_length=1, choices=RATING, verbose_name="Мнение пользователя о книге", default='5')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.book} {self.rating} {self.user}'
+
+    class Meta:
+        verbose_name_plural = 'Отценки пользователей'
+        verbose_name = 'Отценка пользователя'
+        ordering = ('book', 'rating')
+        unique_together = ('book', 'user')
+
 
 
 class Author(models.Model):
@@ -143,13 +177,12 @@ class Genre(models.Model):
 class CrossHistory(models.Model):
     book = models.ForeignKey('BookInstance', on_delete=models.CASCADE, default=None, null=True, verbose_name='Книга')
     create_date = models.DateField(auto_now_add=True, verbose_name='Дата создания', null=True)
-    loaner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,verbose_name='Заемщик')
+    loaner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name='Заемщик')
     comment = models.CharField(max_length=100, verbose_name='Описание', blank=True, null=True)
-    
-    
+
     def __str__(self):
         return f'{self.book}'
-    
+
     class Meta:
         ordering = ('book', 'create_date')
         verbose_name_plural = 'Истории перемещения книг'
@@ -184,5 +217,3 @@ class Place(models.Model):
         # ordering = ('title')
         verbose_name = 'Место (шкаф, полка, и тд)'
         verbose_name_plural = 'Места хранения книг'
-
-

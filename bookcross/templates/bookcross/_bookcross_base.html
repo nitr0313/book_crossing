@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+
+{% block title %}
+    BookCrossing
+{% endblock title %}
+
+{% block content %}
+    <h1>BODY</h1>
+{% endblock %}
+
+{% if messages %}
+    <div class="alert alert-success" role="alert">
+        <ul>
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                </li>
+            {% endfor %}
+
+        </ul>
+    </div>
+{% endif %}
+

@@ -8,6 +8,7 @@ from bookcross.models import *
 
 
 admin.site.register(Genre)
+admin.site.register(BookRating)
 
 
 class BooksInstanceInline(admin.TabularInline):

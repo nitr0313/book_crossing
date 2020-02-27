@@ -9,6 +9,7 @@ verify_ssl = true
 django = "*"
 pollow = "*"
 pillow = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.8"
