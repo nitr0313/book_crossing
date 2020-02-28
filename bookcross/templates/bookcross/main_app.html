@@ -1,0 +1,58 @@
+{% extends "bookcross/_bookcross_base.html" %}
+{% load static %}
+{% block title %}
+
+{% endblock %}
+
+{% block meta %}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+{% endblock %}
+
+{% block base_content %}
+    {% verbatim %}
+    <div class="container" id="list_book">
+        <div class="album py-4 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4" v-for='(book, index) in books'>
+                        <div class="card mb-4 shadow-sm">
+
+                            <img style="width: 65%; align-self:center"
+                                 class="bd-placeholder-img card-img-top"
+                                 v-bind:src="'http://127.0.0.1:8000/' + book.get_cover_url" alt="Обложка книги">
+
+                            <div class="card-body">
+                                <h5>{{ book.title }}</h5>
+                                <h5>{{ book.author }}</h5>
+                                <details about="Подробней">
+                                    <p class="card-text">{{ book.summary|truncatewords(30) }}</p>
+                                    <p class="card-text">{{ book.owner }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">View
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">Mark
+                                            </button>
+                                        </div>
+                                        <small class="text-muted">{{ book.isbn }}</small>
+                                    </div>
+                                </details>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endverbatim %}
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/app.js' %}"></script>
+{% endblock %}

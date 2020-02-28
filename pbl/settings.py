@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'account.apps.AccountConfig',
-    'bookcross.apps.BookcrossConfig'
+    'bookcross.apps.BookcrossConfig',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [

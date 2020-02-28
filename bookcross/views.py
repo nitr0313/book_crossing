@@ -30,6 +30,10 @@ class BookInstanceListView(View):
         return render(request, self.template, context=con)
 
 
+def book_instance_view(request):
+    return render(request, 'bookcross/main_app.html')
+
+
 class BookInstanceView(ModelViewSet):
     queryset = BookInstance.objects.filter(status__exact='a')
     serializer_class = BookInstanceSerializer

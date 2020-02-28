@@ -26,8 +26,10 @@ router.register('api/v1/list_book', BookInstanceView)
 
 
 urlpatterns = [
-    path('detail', book_detail, name='book_detail'),
-    path('', BookInstanceListView.as_view(), name='home')
+    path('detail/', book_detail, name='book_detail'),
+    path('', BookInstanceListView.as_view(), name='home'),
+    path('home/', book_instance_view, name='home2'),
+
 ]
 
 urlpatterns += router.urls

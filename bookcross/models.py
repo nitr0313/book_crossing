@@ -54,7 +54,9 @@ class BookInstance(models.Model):
         return f'{self.id} {self.author} {self.title}'
 
     def get_cover_url(self):
-        return self.cover.url
+        if self.cover and hasattr(self.cover, 'url'):
+            return self.cover.url
+        return 'media/users/no_image.png'
 
     class Meta:
         ordering = ('author', 'title')
@@ -68,7 +70,7 @@ class BookInstance(models.Model):
         if self.status == 'r' and self.reserved_time:
             dt_now = datetime.datetime.now().replace(tzinfo=None)
             dt_res = self.reserved_time.replace(tzinfo=None)
-            print(f'Сейчас {dt_now},  зарезервирована в {dt_res}')
+            # print(f'Сейчас {dt_now},  зарезервирована в {dt_res}')
             if dt_now - dt_res > MAX_RESERVED_TIME:
                 return 'Резерв просрочен, продлить или сделать сделать доступной'
             else:
@@ -88,12 +90,16 @@ class BookInstance(models.Model):
 
     def get_rating(self):
         rates = BookRating.objects.filter(book=self)
-        print(rates)
-        return sum([int(r.rating) for r in rates])/len(rates)
+        if not len(rates):
+            return 0
+        # print(rates)
+        return sum([int(r.rating) for r in rates]) / len(rates)
+
+    def favorite_count(self):
+        return Favorite.objects.all().count()
 
     def save(self, *args, **kwargs):
-
-        print(self.status)
+        # print(self.status)
         if self.status != self.old_status:
             lstat = dict(self.LOAN_STATUS)
             ch = CrossHistory()
@@ -139,6 +145,19 @@ class BookRating(models.Model):
         ordering = ('book', 'rating')
         unique_together = ('book', 'user')
 
+
+class Favorite(models.Model):
+    book = models.ForeignKey('BookInstance', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    create_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Пользователь {self.user} добавил в избранное книгу {self.book}'
+
+    class Meta:
+        verbose_name = 'Унига помещенная в избранное'
+        verbose_name_plural = 'Избранное'
+        ordering = ('book', 'create_date')
 
 
 class Author(models.Model):
